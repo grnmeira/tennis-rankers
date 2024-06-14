@@ -26,8 +26,9 @@ CREATE TABLE IF NOT EXISTS players (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY NOT NULL,
     display_name VARCHAR NOT NULL,
     player_level PlayerLevel NOT NULL,
+    gender Gender,
     status PlayerStatus NOT NULL DEFAULT 'active',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 -- score
@@ -38,7 +39,7 @@ CREATE TYPE ScoreReason AS ENUM('other',
 
 CREATE TABLE IF NOT EXISTS score_ledger (
     player_id uuid NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     reason ScoreReason DEFAULT 'other' NOT NULL,
     comment VARCHAR,
     score INTEGER DEFAULT 0 NOT NULL,
