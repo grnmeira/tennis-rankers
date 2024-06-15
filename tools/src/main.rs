@@ -1,5 +1,6 @@
+use clap::{command, Parser};
 use std::fs::File;
-use clap::{command, Parser };
+use uuid::Uuid;
 
 /// A program that converts a CSV containing ranked players
 /// into an SQL query. The SQL query can be used to import
@@ -17,13 +18,14 @@ struct Args {
 
 #[derive(Default, Debug)]
 struct Player {
+    id: Uuid,
     display_name: String,
     level: String,
     score: i32,
     gender: String,
     total_matches: u32,
     last_match_date: String,
-    punishments: u32
+    punishments: u32,
 }
 
 fn main() {
@@ -46,17 +48,36 @@ fn main() {
                     "O".to_string()
                 }
             },
-            total_matches: record.get(7)
+            total_matches: record
+                .get(7)
                 .unwrap()
                 .to_string()
                 .replace("*", "")
                 .parse::<u32>()
-                .unwrap(),
+                .unwrap_or_default(),
+            punishments: record
+                .get(7)
+                .unwrap()
+                .to_string()
+                .chars()
+                .filter(|&c| c == '*')
+                .count() as u32,
+            id: Uuid::new_v4(),
+            level: match record.get(0).unwrap().split("/").nth(0).unwrap() {
+                "NB" | "B" => "intermediate",
+                "NC" | "C" => "intermediate+",
+                "ND" | "D" => "advanced",
+                _ => "beginner",
+            }
+            .to_string(),
             ..Default::default()
         };
         players.push(p);
     }
-    for p in players{
-        println!("{p:?}");
+    for p in players {
+        println!(
+            "INSERT INTO players VALUE (\"{}\", \"{}\", \"{}\", \"{}\", \"{}\", {})",
+            p.id, p.display_name, p.level, p.gender, "active", 0
+        );
     }
 }

@@ -60,7 +60,13 @@ CREATE INDEX match_player2_index ON matches(player2);
 
 --venues
 CREATE TABLE IF NOT EXISTS venues (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY NOT NULL,
+    display_name VARCHAR NOT NULL,
+    address VARCHAR NOT NULL,
+    location_on_map VARCHAR
 );
 
-CREATE TABLE IF NOT EXISTS favorite_venus (
+CREATE TABLE IF NOT EXISTS favorite_venues (
+    player_id uuid PRIMARY KEY NOT NULL,
+    venue_id uuid PRIMARY KEY NOT NULL
 );
