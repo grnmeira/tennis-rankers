@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- players
+DROP TYPE IF EXISTS PlayerLevel;
 CREATE TYPE PlayerLevel AS ENUM ('beginner',
                                  'beginner+',
                                  'intermediate-',
@@ -16,10 +17,12 @@ CREATE TYPE PlayerLevel AS ENUM ('beginner',
                                  'advanced',
                                  'advanced+');
 
+DROP TYPE IF EXISTS PlayerStatus;
 CREATE TYPE PlayerStatus AS ENUM ('active',
                                   'injured',
                                   'temporarily_unavailable');
 
+DROP TYPE IF EXISTS Gender;
 CREATE TYPE Gender AS ENUM ('M', 'F', 'O');
 
 CREATE TABLE IF NOT EXISTS players (
@@ -32,6 +35,7 @@ CREATE TABLE IF NOT EXISTS players (
 );
 
 -- score
+DROP TYPE IF EXISTS ScoreReason;
 CREATE TYPE ScoreReason AS ENUM('other',
                                 'victory',
                                 'loss',
@@ -50,7 +54,7 @@ CREATE TABLE IF NOT EXISTS score_ledger (
 CREATE TABLE IF NOT EXISTS matches (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY NOT NULL,
     player1 uuid REFERENCES players(id) NOT NULL,
-    player2 uuid REFERENCES players(id) NOT NULL,
+    player2 uuid,
     match_date DATE,
     CHECK (player1 != player2)
 );
@@ -67,6 +71,7 @@ CREATE TABLE IF NOT EXISTS venues (
 );
 
 CREATE TABLE IF NOT EXISTS favorite_venues (
-    player_id uuid PRIMARY KEY NOT NULL,
-    venue_id uuid PRIMARY KEY NOT NULL
+    player_id uuid NOT NULL,
+    venue_id uuid NOT NULL,
+    PRIMARY KEY (player_id, venue_id)
 );
