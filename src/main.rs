@@ -43,7 +43,12 @@ async fn logout(id: Identity) -> impl Responder {
 }
 
 #[shuttle_runtime::main]
-async fn main(#[shuttle_shared_db::Postgres] conn_str: String) -> ShuttleActixWeb<impl FnOnce(&mut ServiceConfig) + Send + Clone + 'static> {
+async fn main(
+    #[shuttle_shared_db::Postgres()] conn_str: String) -> ShuttleActixWeb<impl FnOnce(&mut ServiceConfig) + Send + Clone + 'static> {
+    let pool =  sqlx::PgPool::connect(&conn_str).await.unwrap();
+    let row: (String,) = sqlx::query_as("SELECT display_name FROM players")
+        .fetch_one(&pool).await.unwrap();
+    println!("{row:?}");
     // sqlx::migrate!()
     //     .run(&pool)
     //     .await
