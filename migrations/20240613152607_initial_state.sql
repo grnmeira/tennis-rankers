@@ -31,7 +31,10 @@ CREATE TABLE IF NOT EXISTS players (
     player_level PlayerLevel NOT NULL,
     gender Gender,
     status PlayerStatus NOT NULL DEFAULT 'active',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    _legacy_last_match_date DATE,
+    _legacy_total_matches INTEGER DEFAULT 0 NOT NULL,
+    _legacy_total_punishments INTEGER DEFAULT 0 NOT NULL
 );
 
 -- score
@@ -54,7 +57,7 @@ CREATE TABLE IF NOT EXISTS score_ledger (
 CREATE TABLE IF NOT EXISTS matches (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY NOT NULL,
     player1 uuid REFERENCES players(id) NOT NULL,
-    player2 uuid,
+    player2 uuid REFERENCES players(id) NOT NULL,
     match_date DATE,
     CHECK (player1 != player2)
 );

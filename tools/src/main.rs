@@ -37,9 +37,15 @@ fn main() {
     let mut players = vec![];
     for record in csv_reader.records() {
         let record = record.unwrap();
-        let pos = record.position().expect("Unable to get position for CSV record");
-        let last_match_date = record.get(4).expect(&format!("Unable to get date for last match at position {pos:?}"));
-        let last_match_date = NaiveDate::parse_from_str(last_match_date, "%d/%m/%Y").expect(&format!("Unable to parse date from {pos:?} {last_match_date}"));
+        let pos = record
+            .position()
+            .expect("Unable to get position for CSV record");
+        let last_match_date = record.get(4).expect(&format!(
+            "Unable to get date for last match at position {pos:?}"
+        ));
+        let last_match_date = NaiveDate::parse_from_str(last_match_date, "%d/%m/%Y").expect(
+            &format!("Unable to parse date from {pos:?} {last_match_date}"),
+        );
         let last_match_date = last_match_date.format("%Y-%m-%d").to_string();
         let p = Player {
             display_name: record.get(2).unwrap().to_string(),
@@ -82,15 +88,11 @@ fn main() {
     }
     for p in players {
         println!(
-            "INSERT INTO players(id, display_name, player_level, gender) VALUES ('{}', '{}', '{}', '{}');",
-            p.id, p.display_name, p.level, p.gender);
+            "INSERT INTO players(id, display_name, player_level, gender, _legacy_last_match_date, _legacy_total_matches, _legacy_total_punishments) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}');",
+            p.id, p.display_name, p.level, p.gender, p.last_match_date, p.total_matches, p.punishments);
         println!(
             "INSERT INTO score_ledger(player_id, reason, score, comment) VALUES ('{}', '{}', {}, '{}');",
             p.id, "other", p.score, "score from legacy system"
-        );
-        println!(
-            "INSERT INTO matches(player1, player2, match_date) VALUES ('{}', {}, '{}');",
-            p.id, "NULL", p.last_match_date
         );
     }
 }
